@@ -186,37 +186,37 @@ export default function Dashboard() {
       <div className={`flex-1 transition-all duration-300 ${isSidebarCollapsed ? 'lg:ml-0' : 'lg:ml-64'}`}>
         <div className="min-h-screen bg-[#f8f9fb] dark:bg-gray-900 p-4 sm:p-8">
           <div className="max-w-6xl mx-auto">
-            <div className="mb-8">
+            <div className="mb-6">
               <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                 Pages / Overview
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
                 Overview
               </h1>
             </div>
 
-            <div className="mb-8 rounded-2xl overflow-hidden">
-              <div className="bg-gradient-to-r from-rose-100 via-purple-200 to-blue-200 dark:from-rose-500/20 dark:via-purple-500/20 dark:to-blue-500/20 p-8">
+            <div className="mb-6">
+              <div className="bg-gradient-to-r from-rose-100 via-purple-200 to-blue-200 dark:from-rose-500/20 dark:via-purple-500/20 dark:to-blue-500/20 p-4 sm:p-8 rounded-2xl">
                 <div className="mb-4">
                   <span className="px-3 py-1 text-sm bg-white/20 dark:bg-white/10 rounded-full">
                     CURRENT PLAN
                   </span>
                 </div>
-                <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">
+                <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
                   {PRICING_TIERS[userTier].name}
                 </h2>
                 
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                       API Usage
                     </h3>
                     <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <div className="mb-6">
-                    <div className="text-lg font-medium text-gray-900 dark:text-white">
+                  <div className="mb-4">
+                    <div className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">
                       {totalCreditsUsed.toLocaleString()} / {totalCreditsLimit.toLocaleString()} Credits
                     </div>
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
@@ -233,24 +233,24 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="mb-8">
-              <div className="flex justify-between items-center mb-6">
+            <div className="mb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">API Keys</h2>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    The key is used to authenticate your requests to the Research API. To learn more, see the documentation page.
+                    The key is used to authenticate your requests to the Research API.
                   </p>
                 </div>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+                  className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
                 >
                   + Create New Key
                 </button>
               </div>
 
-              <div className="overflow-x-auto">
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+              <div className="-mx-4 sm:mx-0">
+                <div className="min-w-[640px] bg-white dark:bg-gray-800 rounded-xl shadow-sm">
                   <div className="grid grid-cols-[1.5fr_1fr_2fr_0.5fr] sm:grid-cols-[2fr_1fr_3fr_1fr] gap-2 sm:gap-4 p-4 border-b border-gray-100 dark:border-gray-700">
                     <div className="text-sm font-medium text-gray-500">NAME</div>
                     <div className="text-sm font-medium text-gray-500 hidden sm:block">USAGE</div>
