@@ -2,9 +2,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
-export default function Sidebar() {
+export default function Sidebar({ isCollapsed, onToggle }) {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const isActive = (path) => pathname === path;
 
@@ -67,31 +66,22 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Toggle Button */}
+      {/* Mobile menu button */}
       <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className={`fixed top-4 z-50 bg-white dark:bg-gray-800 p-2 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 ${
-          isCollapsed ? 'left-4' : 'left-60'
-        }`}
+        onClick={onToggle}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-gray-100 dark:bg-gray-800"
       >
-        <svg
-          className={`w-5 h-5 text-gray-600 dark:text-gray-300 transition-transform duration-300 ${
-            isCollapsed ? 'rotate-180' : ''
-          }`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
 
       {/* Sidebar */}
-      <div
-        className={`w-64 bg-white dark:bg-gray-800 h-screen fixed left-0 top-0 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ${
-          isCollapsed ? '-translate-x-full' : 'translate-x-0'
-        }`}
-      >
+      <div className={`
+        fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-800 transform transition-transform duration-300 ease-in-out
+        ${isCollapsed ? '-translate-x-full' : 'translate-x-0'}
+        lg:relative lg:transform-none
+      `}>
         {/* Logo */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <Link href="/" className="flex items-center gap-2">
@@ -138,6 +128,14 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
+
+      {/* Overlay for mobile */}
+      {!isCollapsed && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={onToggle}
+        />
+      )}
     </>
   );
 } 

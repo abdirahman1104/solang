@@ -30,14 +30,14 @@ export default function Protected() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb] dark:bg-gray-900 p-8">
+    <div className="min-h-screen bg-[#f8f9fb] dark:bg-gray-900 p-4 sm:p-8">
       <div className="max-w-2xl mx-auto">
         <BackToDashboard />
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8">
           Protected Route
         </h1>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 sm:p-6">
           <p className="text-gray-600 dark:text-gray-300 mb-4">
             This is a protected route that can only be accessed with a valid API key.
           </p>
