@@ -34,7 +34,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
         lg:translate-x-0 lg:relative
         border-r border-gray-200 dark:border-gray-700
       `}>
-        {/* Logo section - fixed at top */}
+        {/* Logo section */}
         <div className="sticky top-0 bg-white dark:bg-gray-800 z-10 p-4 border-b border-gray-200 dark:border-gray-700">
           <Link href="/" className="flex items-center gap-2">
             {/* <img src="/logo.png" alt="Tavily" className="h-8" /> */}
@@ -42,7 +42,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
           </Link>
         </div>
 
-        {/* Navigation section - scrollable */}
+        {/* Navigation */}
         <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-64px)]">
           <Link
             href="/dashboards"
