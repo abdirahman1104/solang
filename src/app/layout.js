@@ -1,5 +1,7 @@
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { headers, cookies } from 'next/headers';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -11,7 +13,9 @@ export const metadata = {
   description: 'API Key Management Dashboard',
 }
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const supabase = createServerComponentClient({ cookies });
+
   return (
     <html lang="en" className={inter.variable}>
       <body className="antialiased">
