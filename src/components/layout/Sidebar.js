@@ -1,15 +1,33 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { supabase } from '@/utils/supabase';
 
 export default function Sidebar({ isCollapsed, onToggle }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
+    // Get user data
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
   }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      router.push('/auth');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   const isActive = (path) => pathname === path;
 
@@ -33,6 +51,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
         ${isCollapsed ? '-translate-x-full' : 'translate-x-0'}
         lg:translate-x-0 lg:relative
         border-r border-gray-200 dark:border-gray-700
+        flex flex-col
       `}>
         {/* Logo section */}
         <div className="sticky top-0 bg-white dark:bg-gray-800 z-10 p-4 border-b border-gray-200 dark:border-gray-700">
@@ -43,7 +62,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
         </div>
 
         {/* Navigation */}
-        <nav className="p-4 space-y-2 overflow-y-auto h-[calc(100vh-64px)]">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <Link
             href="/dashboards"
             className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
@@ -72,6 +91,53 @@ export default function Sidebar({ isCollapsed, onToggle }) {
             Playground
           </Link>
         </nav>
+
+        {/* User Profile Section */}
+        {user && (
+          <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+            <div className="relative">
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                  {user.email[0].toUpperCase()}
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {user.email}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Free Plan
+                  </p>
+                </div>
+                <svg
+                  className={`w-5 h-5 text-gray-400 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Dropdown Menu */}
+              {isProfileOpen && (
+                <div className="absolute bottom-full left-0 w-full mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1">
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </aside>
 
       {/* Overlay for mobile */}
