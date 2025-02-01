@@ -9,22 +9,44 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const router = useRouter();
   const [showConsent, setShowConsent] = useState(false);
   const [authData, setAuthData] = useState(null);
+  const router = useRouter();
 
+  // Check auth status on mount
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        router.replace('/dashboards');
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          router.replace('/dashboards');
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
       }
     };
     checkAuth();
   }, [router]);
 
+  // Handle auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT') {
+        router.replace('/auth');
+      } else if (event === 'SIGNED_IN' && !showConsent) {
+        router.replace('/dashboards');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router, showConsent]);
+
   const handleSignIn = async (e) => {
     e.preventDefault();
+    if (loading) return;
+
     try {
       setLoading(true);
       setError(null);
@@ -43,40 +65,47 @@ export default function Auth() {
         setAuthData(data);
         setShowConsent(true);
       } else {
-        // Check if user exists in our users table
-        const { data: existingUser } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', data.user.id)
-          .single();
-
-        // If user doesn't exist, create their profile
-        if (!existingUser) {
-          const { error: profileError } = await supabase
+        try {
+          // Check if user exists in our users table
+          const { data: existingUser, error: userError } = await supabase
             .from('users')
-            .insert([
-              {
-                id: data.user.id,
-                email: data.user.email,
-                created_at: new Date().toISOString(),
-                last_login: new Date().toISOString(),
-                consent_given: true,
-                consent_date: new Date().toISOString()
-              }
-            ]);
+            .select('*')
+            .eq('id', data.user.id)
+            .single();
 
-          if (profileError) throw profileError;
-        } else {
-          // Update last login time
-          const { error: updateError } = await supabase
-            .from('users')
-            .update({ last_login: new Date().toISOString() })
-            .eq('id', data.user.id);
+          if (userError && userError.code !== 'PGRST116') throw userError;
 
-          if (updateError) throw updateError;
+          // If user doesn't exist, create their profile
+          if (!existingUser) {
+            const { error: profileError } = await supabase
+              .from('users')
+              .insert([
+                {
+                  id: data.user.id,
+                  email: data.user.email,
+                  created_at: new Date().toISOString(),
+                  last_login: new Date().toISOString(),
+                  consent_given: true,
+                  consent_date: new Date().toISOString()
+                }
+              ]);
+
+            if (profileError) throw profileError;
+          } else {
+            // Update last login time
+            const { error: updateError } = await supabase
+              .from('users')
+              .update({ last_login: new Date().toISOString() })
+              .eq('id', data.user.id);
+
+            if (updateError) throw updateError;
+          }
+
+          router.replace('/dashboards');
+        } catch (dbError) {
+          console.error('Database error:', dbError);
+          throw new Error('Error updating user profile');
         }
-
-        router.replace('/dashboards');
       }
     } catch (error) {
       console.error('Sign in error:', error);
@@ -88,6 +117,7 @@ export default function Auth() {
 
   const handleConsentAccept = async () => {
     try {
+      setLoading(true);
       // Create user profile after consent
       const { error: profileError } = await supabase
         .from('users')
@@ -104,10 +134,13 @@ export default function Auth() {
 
       if (profileError) throw profileError;
 
+      localStorage.setItem('consent_accepted', 'true');
       router.replace('/dashboards');
     } catch (error) {
       console.error('Error creating user profile:', error);
       setError('Error creating user profile. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 

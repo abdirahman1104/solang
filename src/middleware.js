@@ -7,36 +7,34 @@ export async function middleware(request) {
     const res = NextResponse.next();
 
     // Create supabase client
-    const supabase = createMiddlewareClient(
-      { req: request, res },
-      {
-        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-        supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      }
-    );
+    const supabase = createMiddlewareClient({ req: request, res });
 
     // Refresh session if it exists
-    await supabase.auth.getSession();
+    const { data: { session }, error } = await supabase.auth.getSession();
 
-    // Return response
+    // Handle protected routes
+    if (request.nextUrl.pathname.startsWith('/dashboards')) {
+      if (!session) {
+        return NextResponse.redirect(new URL('/auth', request.url));
+      }
+    }
+
+    // Handle auth page when already logged in
+    if (request.nextUrl.pathname === '/auth') {
+      if (session) {
+        return NextResponse.redirect(new URL('/dashboards', request.url));
+      }
+    }
+
     return res;
   } catch (e) {
     console.error('Middleware error:', e);
-    // Return the original response on error
+    // On error, allow the request to continue
     return NextResponse.next();
   }
 }
 
 // Specify which routes to apply middleware to
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - api (API routes)
-     */
-    '/((?!_next/static|_next/image|favicon.ico|api).*)',
-  ],
+  matcher: ['/auth', '/dashboards/:path*']
 }; 
