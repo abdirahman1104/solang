@@ -13,7 +13,7 @@ export default function Auth() {
   const handleSignIn = async (e) => {
     e.preventDefault();
     if (loading) return;
-
+    
     try {
       setLoading(true);
       setError(null);
@@ -88,4 +88,4 @@ export default function Auth() {
       </div>
     </div>
   );
-} 
+}
